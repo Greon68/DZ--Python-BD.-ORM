@@ -232,26 +232,26 @@ qu = session.query(Book, Shop, Sale, Publisher) \
 # for s in qu:
 #     print(f' {s.Book.title} | {s.Shop.name}| {s.Sale.price} | {s.Sale.date_sale}' )
 
+# РЕШЕНИЕ ЗАДАЧИ
 
-# Функция вывода записи через input и or
 publisher_name= input("Из списка:\n\n1:Пушкин \n2:Достоевский \n3:Чехов\n\nВведите фамилию автора , "
                       "либо напишите 'None' если хотите получить результат исключительно через id автора : ")
 publisher_id = int(input("Введите id автора ,либо цифру '0' если хотите получить результат исключительно через  фамилию автора :  "))
-# Функция вывода записи через input и or
-def query_func (publisher_name= None, publisher_id= None ) :
 
+
+def query_func (publisher_name= None, publisher_id= None ) :
     ''' Функция принимает на вход либо имя автора , либо его id из таблицы Publisher.
-     На выходе получаем таблицу со столбцами :
-     название книги | название магазина, в котором была куплена эта книга | стоимость покупки | дата покупки'''
+          На выходе получаем таблицу со столбцами :
+          название книги | название магазина, в котором была куплена эта книга | стоимость покупки | дата покупки'''
     print()
     if publisher_id == 0 :
         for s in qu.filter (Publisher.name == publisher_name ).all():
-            print(f'{(s.Book.title).ljust(18)} | {(s.Shop.name).ljust(14)}| {(s.Sale.price)} | {(s.Sale.date_sale)}')
+            print(f' {s.Book.title.ljust(18)} | {s.Shop.name.ljust(14)}| {s.Sale.price} | {s.Sale.date_sale}')
 
     elif publisher_id != 0:
         for s in qu.filter(or_ (Publisher.name == publisher_name ,Publisher.id == publisher_id )).all():
-            print(
-                f'{(s.Book.title).ljust(18)} | {(s.Shop.name).ljust(14)}| {(s.Sale.price)} | {(s.Sale.date_sale)}')
+            print(f' {s.Book.title.ljust(18)} | {s.Shop.name.ljust(14)}| {s.Sale.price} | {s.Sale.date_sale}')
 
-# Вызываем функцию
+
+# Вызов функции
 query_func (publisher_name, publisher_id )
