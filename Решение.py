@@ -246,11 +246,12 @@ def query_func (publisher_name= None, publisher_id= None ) :
     print()
     if publisher_id == 0 :
         for s in qu.filter (Publisher.name == publisher_name ).all():
-            print(f'{s.Book.title} | {s.Shop.name}| {s.Sale.price} | {s.Sale.date_sale}')
+            print(f'{(s.Book.title).ljust(18)} | {(s.Shop.name).ljust(14)}| {(s.Sale.price)} | {(s.Sale.date_sale)}')
 
     elif publisher_id != 0:
         for s in qu.filter(or_ (Publisher.name == publisher_name ,Publisher.id == publisher_id )).all():
-           print(f' {s.Book.title} | {s.Shop.name}| {s.Sale.price} | {s.Sale.date_sale}' )
+            print(
+                f'{(s.Book.title).ljust(18)} | {(s.Shop.name).ljust(14)}| {(s.Sale.price)} | {(s.Sale.date_sale)}')
 
 # Вызываем функцию
 query_func (publisher_name, publisher_id )
