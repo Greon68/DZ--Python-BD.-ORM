@@ -1,3 +1,31 @@
+# Легенда: система хранит информацию об издателях (авторах), их книгах и фактах продажи.
+# Книги могут продаваться в разных магазинах,
+# поэтому требуется учитывать не только что за книга была продана,
+# но и в каком магазине это было сделано, а также когда.
+#
+# Интуитивно необходимо выбрать подходящие типы и связи полей.
+
+# Задание 2
+# Используя SQLAlchemy, составить запрос выборки магазинов, продающих целевого издателя.
+#
+# Напишите Python-скрипт, который:
+#
+# подключается к БД любого типа на ваш выбор, например, к PostgreSQL;
+# импортирует необходимые модели данных;
+# принимает имя или идентификатор издателя (publisher), например, через input().
+# Выводит построчно факты покупки книг этого издателя:
+# название книги | название магазина, в котором была куплена эта книга | стоимость покупки | дата покупки
+# Пример (было введено имя автора — Пушкин):
+#
+# Капитанская дочка | Буквоед     | 600 | 09-11-2022
+# Руслан и Людмила  | Буквоед     | 500 | 08-11-2022
+# Капитанская дочка | Лабиринт    | 580 | 05-11-2022
+# Евгений Онегин    | Книжный дом | 490 | 02-11-2022
+# Капитанская дочка | Буквоед     | 600 | 26-10-2022
+
+
+
+
 # Импортируем библиотеки
 import sqlalchemy
 import sqlalchemy as sq
@@ -191,55 +219,38 @@ session.add_all([sale9, sale10, sale11, sale12,sale13, sale14, sale15, sale16])
 session.add_all([sale1])
 session.commit() # фиксируем изменения
 
-# Объединяю все таблицы - Publisher , Book , Stok , Shop и Sale
 
-pbstshsl = session.query(Publisher).\
-    join(Book, Book.publisher_id == Publisher.id).\
-    join (Stock, Stock.book_id == Book.id ).\
-    join (Shop ,Stock.shop_id == Shop.id).\
-    join (Sale, Sale.stock_id == Stock.id )
+# Объединяем таблицы для решения поставленной задачи
+qu = session.query(Book, Shop, Sale, Publisher) \
+    .join(Book) \
+    .join(Stock) \
+    .join(Sale) \
+    .join(Shop)
+    #.filter(Publisher.name == input('Введите название издателя: ')).all()
 
-# СВЯЗИ ПОЛНОСТЬЮ НЕ РАБОТАЮТ . ПЫТАЮСЬ РАЗОБРАТЬСЯ
+# # Проверка - Итерируемся по строкам
+# for s in qu:
+#     print(f' {s.Book.title} | {s.Shop.name}| {s.Sale.price} | {s.Sale.date_sale}' )
 
-# Объединяем Publisher , Book и Stok
 
-pb = session.query(Publisher).\
-    join(Book, Book.publisher_id == Publisher.id).\
-    join (Stock, Stock.book_id == Book.id)
-    # filter(Stock.id ==1 )
+# Функция вывода записи через input и or
+publisher_name= input("Из списка:\n\n1:Пушкин \n2:Достоевский \n3:Чехов\n\nВведите фамилию автора , "
+                      "либо напишите 'None' если хотите получить результат исключительно через id автора : ")
+publisher_id = int(input("Введите id автора ,либо цифру '0' если хотите получить результат исключительно через  фамилию автора :  "))
+# Функция вывода записи через input и or
+def query_func (publisher_name= None, publisher_id= None ) :
 
-#Цикл по 1-й строке
-# for s in pb.all():
-#     print(s.id, s.name)
-# print("\n")
-#
-# Цикл по 2-м строкам
-# for s in pb.all():
-#     print(s.id, s.name)
-#     for bk in s.book:
-#         print("\t",bk.id, bk.title)
-# print("\n")
-#
-# # Цикл по 3-м строкам
-#
-# for s in pb.all():
-#     # print(s.id, s.name)
-#     for bk in s.book:
-#         # print(s.id, s.name,bk.id, bk.title)
-#         for st in bk.stock:
-#             print(f'Автор: {s.name} | Книга : {bk.title}   |   Сток-id - {st.id} : количество - {st.count} | ')
-# #
-# print("\n")
+    ''' Функция принимает на вход либо имя автора , либо его id из таблицы Publisher.
+     На выходе получаем таблицу со столбцами :
+     название книги | название магазина, в котором была куплена эта книга | стоимость покупки | дата покупки'''
+    print()
+    if publisher_id == 0 :
+        for s in qu.filter (Publisher.name == publisher_name ).all():
+            print(f'{s.Book.title} | {s.Shop.name}| {s.Sale.price} | {s.Sale.date_sale}')
 
-# Работаем с Stock и Shop
-# spsh = session.query(Shop). join(Stock, Stock.shop_id == Shop.id)
-# for s in spsh.all():
-#     print(s.id,s.name)
-#     for sh in s.stock:
-#         print('\t',sh.id,sh.shop_id)
+    elif publisher_id != 0:
+        for s in qu.filter(or_ (Publisher.name == publisher_name ,Publisher.id == publisher_id )).all():
+           print(f' {s.Book.title} | {s.Shop.name}| {s.Sale.price} | {s.Sale.date_sale}' )
 
-shsp = session.query(Stock). join(Shop, Stock.shop_id == Shop.id)
-for s in shsp.all():
-    #print(s.id,s.name)
-    for sh in s.shop:
-        print(sh.id,sh.shop_id)
+# Вызываем функцию
+query_func (publisher_name, publisher_id )
