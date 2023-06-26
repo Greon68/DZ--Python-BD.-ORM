@@ -191,12 +191,23 @@ session.add_all([sale9, sale10, sale11, sale12,sale13, sale14, sale15, sale16])
 session.add_all([sale1])
 session.commit() # фиксируем изменения
 
+# Объединяю все таблицы - Publisher , Book , Stok , Shop и Sale
+
+pbstshsl = session.query(Publisher).\
+    join(Book, Book.publisher_id == Publisher.id).\
+    join (Stock, Stock.book_id == Book.id ).\
+    join (Shop ,Stock.shop_id == Shop.id).\
+    join (Sale, Sale.stock_id == Stock.id )
+
+# СВЯЗИ ПОЛНОСТЬЮ НЕ РАБОТАЮТ . ПЫТАЮСЬ РАЗОБРАТЬСЯ
+
 # Объединяем Publisher , Book и Stok
 
 pb = session.query(Publisher).\
     join(Book, Book.publisher_id == Publisher.id).\
     join (Stock, Stock.book_id == Book.id)
     # filter(Stock.id ==1 )
+
 #Цикл по 1-й строке
 # for s in pb.all():
 #     print(s.id, s.name)
